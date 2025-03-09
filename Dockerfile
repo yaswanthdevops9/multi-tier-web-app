@@ -1,5 +1,5 @@
 FROM openjdk:17
 COPY . /app
 WORKDIR /app
-RUN ./mvnw package
+RUN mvn package
 CMD ["java", "-jar", "target/*.jar"]
