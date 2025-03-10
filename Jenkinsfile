@@ -6,20 +6,21 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
-                    sh 'git clone https://$GIT_USER:$GIT_PASS@github.com/yaswanthdevops9/multi-tier-web-app.git'
-                }
+                deleteDir() // Clean workspace before checkout
+                checkout scm  // Use Jenkins built-in SCM checkout
             }
         }
         stage('Terraform Init & Apply') {
             steps {
-                sh 'terraform init'
-                sh 'terraform apply -auto-approve'
+                dir('terraform') { // Run Terraform inside the correct directory
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
+                }
             }
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t myapp:latest .'
+                sh 'docker build -t myapp:latest ${WORKSPACE}' // Use Jenkins workspace
             }
         }
         stage('Push Docker Image') {
